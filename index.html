@@ -126,7 +126,7 @@ function seed(){
  mg:[],pairs:{},pins:{u1:'98542a00028f3e885bbd0c3a65d48372d7ec90cc91997af6cb2fadaef2afe3aa',u2:'a96ce54c27f76a88ec62dc3c9f432f7938b92eb37973b29fd0e5617e84754aee',u3:'cbe1cb68df5b9062953b581f524c928f227f7c35af8c390b2a6584428bcd3645',u4:'77c697fcd0fbbac6a008d1be5612acfb6b47153c5980a7964622f5f8bbc908c1',u5:'f4d2b5e034a95360c068144584f4623ceae07d5e2286c7c315e195af9e2340d7'}}}
 let S;try{S=JSON.parse(localStorage.getItem(K))}catch(e){}
 if(!S||!S.users)S=seed();if(!S.mg)S.mg=[];
-const SB={url:'https://teriotoixpdrbfstjpym.supabase.co',key:'sb_publishable_KwR5Zbs1RBYtQceeupDD0Q_viclW'},SBON=/^https:\/\//.test(SB.url)&&SB.key.length>20;
+const SB={url:'https://teriotoixpdrbfstjpym.supabase.co',key:'sb_publishable_KwR5Zbs1RBYtQceeupDD0Q_viclWXeQ'},SBON=/^https:\/\//.test(SB.url)&&SB.key.length>20;
 let PUSH=0,SIG='',WARN=0;
 const save=()=>{try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}if(SBON&&S.me)push()};
 const HD=SB.key.startsWith('eyJ')?{apikey:SB.key,Authorization:'Bearer '+SB.key}:{apikey:SB.key};
