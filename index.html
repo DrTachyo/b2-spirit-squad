@@ -207,12 +207,16 @@ async function doSave(){
   let ok=false;
   const wasNew=BV===0;
   if(wasNew){
-    // insert only: if a record already exists, this device is out of date
+    // create the record only if it does not exist yet
     const b=await fetch(SB.url+'/rest/v1/docs',{method:'POST',headers:{...H,Prefer:'return=representation,resolution=ignore-duplicates'},body:JSON.stringify([{id,data:body,updated_at:stamp}])});
     if(!b.ok)throw new Error(b.status);
     ok=(await b.json()).length>0;
-  }else{
-    const a=await fetch(SB.url+'/rest/v1/docs?id=eq.'+id+'&data->>v=eq.'+BV,{method:'PATCH',headers:H,body:JSON.stringify({data:body,updated_at:stamp})});
+  }
+  if(!ok){
+    // update the record only if its stored version is the one this device last saw.
+    // a record saved before version numbers existed counts as version 0.
+    const vf=wasNew?'or=(data->>v.is.null,data->>v.eq.0)':'data->>v=eq.'+BV;
+    const a=await fetch(SB.url+'/rest/v1/docs?id=eq.'+id+'&'+vf,{method:'PATCH',headers:H,body:JSON.stringify({data:body,updated_at:stamp})});
     if(!a.ok)throw new Error(a.status);
     ok=(await a.json()).length>0;
   }
@@ -221,6 +225,7 @@ async function doSave(){
  }catch(e){toast('Could not save online. Your change is kept on this device and will retry.')}
  finally{SAVING=false;if(NEED){NEED=0;push()}}
 }
+
 // Three-way merge: BASE is what this device last knew, L is this device's changes, Sv is the server now.
 function mergeDocs(B,L,Sv){
   const eq=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
