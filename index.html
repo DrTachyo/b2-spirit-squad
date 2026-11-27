@@ -175,7 +175,7 @@ let SKS={},LVL={},LT='',scT=0,ED=null;
 const ymd=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'),fmtD=x=>new Date(x+'T12:00:00').toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 let GD=ymd(new Date());
 const RK=['Cadet','Airman','Pilot','Captain','Major','Colonel','General'];
-const TABS=[['home','Mission control'],['goals','Missions'],['res','Hangar'],['str','Briefing room'],['ops','Ops board'],['rec','After-action'],['pair','Wingmen'],['epic','Epic Fury'],['pro','Profile']];
+const TABS=[['home','Mission control'],['goals','Missions'],['res','Hangar'],['str','Briefing room'],['ops','Ops board'],['rec','After-action'],['epic','Epic Fury'],['pro','Profile']];
 function seed(){
  const u=(id,call,av,bio,reward,mile,pts,streak,mp,last,n)=>{const log={};return{id,call,av,bio,reward,mile,pts,streak,mp,mk:M,last,fz:2,fzm:M,log}};
  return{me:'u1',tab:'home',users:[
@@ -183,11 +183,12 @@ function seed(){
   u('u2','Raven','🦅','Organic chemistry grind','Favorite takeout',10,0,0,0,'',2),
   u('u3','Falcon','🛰️','Revising history notes daily','Gaming evening',21,0,0,0,'',3),
   u('u4','Nova','⭐','Learning Python in public','Sleep-in Sunday',14,0,0,0,'',4),
-  u('u5','Viper','🐍','Building study habits one day at a time','Dinner out',14,0,0,0,'',5)],
+  u('u5','Viper','🐍','Building study habits one day at a time','Dinner out',14,0,0,0,'',5),
+  u('u6','Pilot 6','🙂','','',14,0,0,0,'',6)],
  goals:[],
  res:[],
  posts:[],
- mg:[],pairs:{},pins:{u1:'98542a00028f3e885bbd0c3a65d48372d7ec90cc91997af6cb2fadaef2afe3aa',u2:'a96ce54c27f76a88ec62dc3c9f432f7938b92eb37973b29fd0e5617e84754aee',u3:'cbe1cb68df5b9062953b581f524c928f227f7c35af8c390b2a6584428bcd3645',u4:'77c697fcd0fbbac6a008d1be5612acfb6b47153c5980a7964622f5f8bbc908c1',u5:'f4d2b5e034a95360c068144584f4623ceae07d5e2286c7c315e195af9e2340d7'}}}
+ mg:[],pairs:{},pins:{u1:'98542a00028f3e885bbd0c3a65d48372d7ec90cc91997af6cb2fadaef2afe3aa',u2:'a96ce54c27f76a88ec62dc3c9f432f7938b92eb37973b29fd0e5617e84754aee',u3:'cbe1cb68df5b9062953b581f524c928f227f7c35af8c390b2a6584428bcd3645',u4:'77c697fcd0fbbac6a008d1be5612acfb6b47153c5980a7964622f5f8bbc908c1',u5:'f4d2b5e034a95360c068144584f4623ceae07d5e2286c7c315e195af9e2340d7',u6:'d7ff001a7c28986f0684a49e85d2cc7b363a0c99e219370737d6d3cca44c7048'}}}
 let S;try{S=JSON.parse(localStorage.getItem(K))}catch(e){}
 if(!S||!S.users)S=seed();if(!S.mg)S.mg=[];
 const SB={url:'https://teriotoixpdrbfstjpym.supabase.co',key:'sb_publishable_KwR5Zbs1RBYtQceeupDD0Q_viclWXeQ'},SBON=/^https:\/\//.test(SB.url)&&SB.key.length>20;
@@ -555,7 +556,7 @@ home(){const u=me(),L=u.pts%100,done=u.last===T;return `
 <div class="pn hero"><svg class='wm ${done?'lit':''}' viewBox='0 0 200 78' aria-hidden='true'><use href='#wing'/><g class='wd'><circle class='wn' cx='100' cy='3.5' r='1.5' fill='#fff'/><circle class='wn' cx='3.5' cy='66' r='1.5' fill='#ff5a5a'/><circle class='wn' cx='196.5' cy='66' r='1.5' fill='#52c68b'/></g></svg>
 <div class="mu sm">${rank(u)}, level ${Math.floor(u.pts/100)+1}</div><h1>${E(u.call)}</h1><p class="mu" style="max-width:46ch">${E(u.bio)||'Add a bio in Profile.'}</p>
 <div class='fp' style='--p:${L}%'><i style='width:${L}%'></i><svg viewBox='0 0 200 78' aria-hidden='true'><use href='#wing'/></svg></div><div class="mu sm">${100-L} points to the next rank</div>
-<div style="margin-top:16px"><button class="b" ${done?'disabled':''} onclick="sortie()">${done?'Today’s sortie is logged':'Log today’s sortie (+10)'}</button></div></div>
+<div id='sb'>${sbannerHTML(u,done)}</div><div style="margin-top:16px"><button class="b" ${done?'disabled':''} onclick="sortie()">${done?'Today’s sortie is logged':'Log today’s sortie (+10)'}</button></div></div>
 <div class="g4"><div class="pn"><div class="mu sm">Streak</div><div class='k' id='sk' data-v='${u.streak}' style='color:var(--hi)'>${u.streak}</div><div class="mu sm">days</div></div>
 <div class="pn"><div class="mu sm">Total points</div><div class='k' data-v='${u.pts}'>${u.pts}</div></div>
 <div class="pn"><div class="mu sm">This month</div><div class='k' data-v='${mpts(u)}'>${mpts(u)}</div></div>
@@ -588,7 +589,7 @@ function R(){ epicCheck();
  const mn=$('#main');mn.innerHTML='<i class="cb l"></i><i class="cb r"></i>'+V[S.tab]();mn.classList.toggle('gs',S.tab==='rec');if(S.tab!==LT){LT=S.tab;if(!RM){mn.classList.remove('scan');void mn.offsetWidth;mn.classList.add('scan');clearTimeout(scT);scT=setTimeout(()=>mn.classList.remove('scan'),950)}}rl();draw();cu();setTimeout(()=>{for(const k in LVL)delete LVL[k]},1800)}
 const RM=matchMedia('(prefers-reduced-motion:reduce)').matches,AK='b2-auth-v4';let AUTH=null,fails=0,until=0,fg=0;try{AUTH=localStorage.getItem(AK)}catch(e){}if(!S.pins)S.pins={};if(!S.users.some(u=>u.id==='u5')){S.users.push({id:'u5',call:'Viper',av:'🐍',bio:'Building study habits one day at a time',reward:'Dinner out',mile:14,pts:0,streak:0,mp:0,mk:M,last:'',fz:2,fzm:M,log:{}});save()}if(!S.pins.u5){S.pins.u5='f4d2b5e034a95360c068144584f4623ceae07d5e2286c7c315e195af9e2340d7';save()}
 async function hs(id,p){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('b2:'+id+':'+p));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){return btoa('b2:'+id+':'+p)}}
-function radar(){const P=[[.62,35],[.38,150],[.78,225],[.5,305],[.55,100]];return `<div class='radar' role='img' aria-label='Squad radar'><div class='sweep'></div>${S.users.map((u,i)=>{const [r,a]=P[i%P.length],x=50+r*48*Math.sin(a*Math.PI/180),y=50-r*48*Math.cos(a*Math.PI/180);return `<span class='bl ${u.last===T?'on':''}' style='left:${x}%;top:${y}%'><b>${E(u.call)}</b></span>`}).join('')}</div><div class='mu sm' style='text-align:center;margin-top:8px'>Green blips have logged today’s sortie.</div>`}
+function radar(){const P=[[.62,35],[.38,150],[.78,225],[.5,305],[.55,100],[.7,190],[.4,265],[.85,330]];return `<div class='radar' role='img' aria-label='Squad radar'><div class='sweep'></div>${S.users.map((u,i)=>{const [r,a]=P[i%P.length],x=50+r*48*Math.sin(a*Math.PI/180),y=50-r*48*Math.cos(a*Math.PI/180);return `<span class='bl ${u.last===T?'on':''}' style='left:${x}%;top:${y}%'><b>${E(u.call)}</b></span>`}).join('')}</div><div class='mu sm' style='text-align:center;margin-top:8px'>Green blips have logged today’s sortie.</div>`}
 // Speed: each completed daily task scores 50 at the squad's median single-task time, 100 at half that time or faster.
 function speedFor(){const since=D(-6),all=[];S.goals.forEach(g=>{if(g.k!=='m'&&g.dur!=null&&g.date>=since)all.push({u:g.u,d:Math.max(1000,g.dur)})});
  const out={},ds=all.map(x=>x.d).sort((a,b)=>a-b);if(!ds.length)return out;const r=ds[Math.floor(ds.length/2)];
@@ -711,5 +712,17 @@ addEventListener('message',e=>{
 });
 </script>
 <div id='pick' hidden><div class='pk'><h2>Congratulations, all missions complete</h2><p>Choose an aircraft to fly.</p><div class='ac'><button onclick='pickAircraft(0)'>F-35 Lightning</button><button onclick='pickAircraft(1)'>B-52 Stratofortress</button><button onclick='pickAircraft(2)'>Boeing C-17 Globemaster</button><button onclick='pickAircraft(3)'>B-1 Lancer</button><button onclick='pickAircraft(4)'>B-2 Spirit</button><button onclick='pickAircraft(5)'>F-16</button><button onclick='pickAircraft(6)'>AC-130 Gunship</button><button onclick='pickAircraft(7)'>Boeing E-3 Sentry</button></div></div></div>
+<script>
+// Reminder banner and countdown on Mission control. Shows only while today's sortie is not logged.
+function cdText(){const left=Math.max(0,Date.parse(D(1)+'T00:00:00Z')-Date.now());return Math.floor(left/3600000)+' h '+Math.floor(left%3600000/60000)+' min left'}
+function sbannerHTML(u,done){
+  if(done) return '';
+  const cd=' <span class="mu sm" id="scd">'+cdText()+'</span>';
+  if(u.last&&u.last<D(-1)) return `<div class="pn" style="border-color:var(--hi);margin:12px 0 0"><b>You missed a day.</b> Log today’s sortie to start a new streak.${cd}</div>`;
+  if(u.streak>0) return `<div class="pn" style="border-color:var(--hi);margin:12px 0 0"><b style="color:var(--hi)">Streak at risk.</b> Log today’s sortie to keep your ${u.streak}-day streak.${cd}</div>`;
+  return `<div class="pn" style="margin:12px 0 0"><b>Log today’s sortie</b> to start your streak.${cd}</div>`;
+}
+setInterval(()=>{const e=document.getElementById('scd');if(e)e.textContent=cdText()},30000);
+</script>
 </body>
 </html>
